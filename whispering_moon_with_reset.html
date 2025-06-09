@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Whispering Moon Tarot</title>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background: #1e1b2e;
+      color: #e0d6f9;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2.5em;
+      color: #c9a1ff;
+    }
+    .zodiac-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .zodiac-grid button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor:pointer;
+      background: #322a5c;
+      color:#fff;
+    }
+    .zodiac-grid button:hover {
+      background: #4a3f75;
+    }
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .card {
+      width: 300px;
+      height: 480px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+      overflow: hidden;
+      position: relative;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 10px;
+    }
+    .card-back {
+      background-image: url('https://images.squarespace-cdn.com/content/v1/660db03c8d9c421e964f38f2/1e32317b-78f9-4ad9-8829-45fb9321f5ce/logo.jpg.jpg?format=1000w');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: #fff;
+    }
+    .card-front {
+      background: #fff;
+      color: #000;
+      transform: rotateY(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      font-size: 0.9em;
+      text-align: center;
+    }
+    .card-front img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+    #horoscope {
+      margin-top: 20px;
+      background: #2c2144;
+      border: 2px solid #503c79;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 0 15px #00000088;
+    }
+  
+    .styled-reset {
+      background: #322a5c;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .styled-reset:hover {
+      background: #4a3f75;
+    }
+    </style>
+</head>
+<body>
+  <header>
+    <h1>Whispering Moon Tarot</h1>
+  </header>
+
+  <h2>Select Your Zodiac Sign</h2>
+  <div class="zodiac-grid" id="zodiac-grid">
+    <button onclick="startReading('aries')">♈ Aries</button>
+    <button onclick="startReading('taurus')">♉ Taurus</button>
+    <button onclick="startReading('gemini')">♊ Gemini</button>
+    <button onclick="startReading('cancer')">♋ Cancer</button>
+    <button onclick="startReading('leo')">♌ Leo</button>
+    <button onclick="startReading('virgo')">♍ Virgo</button>
+    <button onclick="startReading('libra')">♎ Libra</button>
+    <button onclick="startReading('scorpio')">♏ Scorpio</button>
+    <button onclick="startReading('sagittarius')">♐ Sagittarius</button>
+    <button onclick="startReading('capricorn')">♑ Capricorn</button>
+    <button onclick="startReading('aquarius')">♒ Aquarius</button>
+    <button onclick="startReading('pisces')">♓ Pisces</button>
+  </div>
+
+  <div id="horoscope"></div>
+        <div style="margin-top: 20px;">
+          <button onclick="resetZodiac()" class="styled-reset">← Choose a Different Sign</button>
+        </div>
+  <div class="cards" id="cards"></div>
+
+  <script>
+    const fullDeck = [{
+        name: "The Fool",
+        description: "New beginnings, innocence, spontaneity.",
+        image: "https://images.squarespace-cdn.com/content/v1/660db03c8d9c421e964f38f2/0235167a-b6e9-4b83-8486-8b3c14e83016/00-TheFool.png?format=300w"
+    },{
+        name: "The Magician",
+        description: "Manifestation, resourcefulness, power.",
+        image: "https://images.squarespace-cdn.com/content/v1/660db03c8d9c421e964f38f2/31f4a7b1-e427-4f9a-b1ba-f5ee03144761/01-TheMagician.png?format=300w"
+    },{
+        name: "The High Priestess",
+        description: "Intuition, sacred knowledge, divine feminine.",
+        image: "https://images.squarespace-cdn.com/content/v1/660db03c8d9c421e964f38f2/3e66441b-1db8-4010-9a5f-8c1b864ab788/02-TheHighPriestess.png?format=300w"
+    },{
+        name: "Two of Cups",
+        description: "Partnership, unity, love, connection.",
+        image: "https://images.squarespace-cdn.com/content/v1/660db03c8d9c421e964f38f2/1ab1bc0d-825a-4e14-a44c-dec22aa72d31/Cups02.png?format=300w"
+    }];
+
+    async function startReading(zodiacSign) {
+      document.getElementById('zodiac-grid').style.display = 'none';
+
+      const horoscopeBox = document.getElementById('horoscope');
+      try {
+        const res = await fetch(`https://ohmanda.com/api/horoscope/${zodiacSign}`);
+        const data = await res.json();
+        horoscopeBox.innerHTML = `
+          <h3>Your Horoscope for ${zodiacSign.charAt(0).toUpperCase() + zodiacSign.slice(1)}</h3>
+          <p>${data.horoscope}</p>`;
+      } catch (e) {
+        horoscopeBox.innerHTML = `
+          <h3>Your Horoscope for ${zodiacSign}</h3>
+          <p><em>(Offline mode)</em> Your intuition guides you toward growth today.</p>`;
+      }
+
+      drawCards();
+    }
+
+    function resetZodiac() {
+      document.getElementById('zodiac-grid').style.display = 'flex';
+      document.getElementById('horoscope').innerHTML = '';
+      document.getElementById('cards').innerHTML = '';
+    }
+
+    function drawCards() {
+      const selected = fullDeck.sort(() => 0.5 - Math.random()).slice(0, 3);
+      const container = document.getElementById('cards');
+      container.innerHTML = '';
+      selected.forEach(card => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+        cardDiv.onclick = () => cardDiv.classList.toggle('flipped');
+        cardDiv.innerHTML = `
+          <div class="card-inner">
+            <div class="card-back"></div>
+            <div class="card-front">
+              <img src="${card.image}" alt="${card.name}">
+            </div>
+          </div>`;
+        container.appendChild(cardDiv);
+      });
+    }
+  </script>
+</body>
+</html>
